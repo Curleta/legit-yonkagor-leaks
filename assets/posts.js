@@ -1,3 +1,7 @@
+const mainOutput = document.getElementById("posts");
+
+var fullTimeAndDate;
+
 function decode(date, time) {
     const months = [
         "January",
@@ -34,3 +38,47 @@ function decode(date, time) {
 
     fullTimeAndDate =`${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} at ` + `${displayH}:${m}:${s} ${period}`;
 }
+
+fetch("/assets/data.json")
+    .then(response => {
+        if(!response.ok) {
+            console.error("Error loading data:", response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        for(let i = 0; i < data.length; i++) {
+            decode(data[i].date, data[i].time);
+            const postContainer = document.createElement("div");
+            const postDate = document.createElement("p");
+            const postDesciption = document.createElement("p");
+            const imgContainer = document.createElement("div");
+            const postImg1 = document.createElement("img");
+            const postImg2 = document.createElement("img");
+
+            mainOutput.appendChild(postContainer);
+            postContainer.className = "post-container";
+
+            postContainer.appendChild(postDate);
+            postDate.className = "post-date";
+            postDate.innerHTML = fullTimeAndDate;
+            
+            postContainer.appendChild(postDesciption);
+            postDesciption.className = "post-description";
+            postDesciption.innerHTML = data[i].content;
+
+            postContainer.appendChild(imgContainer);
+            imgContainer.className = "img-container";
+
+            postContainer.appendChild(postImg1);
+            postImg1.src = `/assets/post-img/post${i + 1}/post${i + 1}_img1.png`;
+            postImg1.className = "post-img";
+
+            postContainer.appendChild(postImg2);
+            postImg2.src = `/assets/post-img/post${i + 1}/post${i + 1}_img2.png`;
+            postImg2.className = "post-img";
+        }
+    })
+    .catch(err => {
+        console.error("Problem importing data: ", err);
+    });
